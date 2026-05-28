@@ -15,7 +15,11 @@ type TerminalEntry = {
 
 const splitCommand = (input: string) => input.trim().toLowerCase();
 
-export default function TerminalApp() {
+type TerminalAppProps = {
+  onLaunchAICore?: () => void;
+};
+
+export default function TerminalApp({ onLaunchAICore }: TerminalAppProps) {
   const [entries, setEntries] = useState<TerminalEntry[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
@@ -72,12 +76,10 @@ export default function TerminalApp() {
 
     const commandHandler = terminalCommands[normalized];
     if (commandHandler) {
+      if (normalized === "launch ai-core" && onLaunchAICore) {
+        onLaunchAICore();
+      }
       commandHandler.execute([], (lines) => appendLines(entryId, lines));
-      return;
-    }
-
-    if (normalized === "launch ai-core") {
-      terminalCommands["launch ai-core"].execute([], (lines) => appendLines(entryId, lines));
       return;
     }
 
@@ -101,14 +103,17 @@ export default function TerminalApp() {
         </p>
       </div>
 
-      <div className="rounded-[1.75rem] border border-white/10 bg-black/20 p-5 shadow-[0_0_40px_rgba(34,211,238,0.12)]">
+      <div className="relative rounded-[1.75rem] border border-white/10 bg-black/20 p-5 shadow-[0_0_40px_rgba(34,211,238,0.12)]">
+        <div className="absolute left-4 top-4 h-1 w-24 rounded-full bg-cyan-400/20 blur-xl" />
         <div className="mb-4 flex items-center justify-between rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-xs uppercase tracking-[0.3em] text-cyan-300/75">
           <span>Session</span>
           <span className="rounded-full bg-cyan-400/10 px-2 py-1 text-cyan-100">live</span>
         </div>
 
-        <div className="rounded-[1.5rem] border border-white/10 bg-[#03101c]/90 p-4 font-mono text-sm text-green-200 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]">
-          <div className="max-h-[20rem] space-y-3 overflow-y-auto pr-3 text-sm leading-6">
+        <div className="relative rounded-[1.5rem] border border-white/10 bg-[#03101c]/90 p-4 font-mono text-sm text-green-200 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_20%)] pointer-events-none" />
+          <div className="relative max-h-[20rem] space-y-3 overflow-y-auto pr-3 text-sm leading-6">
             {entries.length === 0 ? (
               <div className="text-gray-400">Type &quot;help&quot; to begin.</div>
             ) : (
@@ -117,7 +122,7 @@ export default function TerminalApp() {
                   {entry.lines.map((line, index) => (
                     <div
                       key={`${entry.id}-${index}`}
-                      className={
+                      className={`terminal-line ${
                         line.tone === "highlight"
                           ? "text-cyan-200"
                           : line.tone === "system"
@@ -127,7 +132,7 @@ export default function TerminalApp() {
                           : line.tone === "error"
                           ? "text-rose-300"
                           : "text-green-200"
-                      }
+                      }`}
                     >
                       {line.text}
                     </div>

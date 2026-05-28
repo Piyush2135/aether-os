@@ -72,8 +72,8 @@ export default function Window({
   };
 
   const activeClasses = isActive
-    ? "opacity-100 shadow-[0_40px_120px_rgba(34,211,238,0.22)]"
-    : "opacity-80 shadow-[0_25px_90px_rgba(0,0,0,0.18)] scale-[0.99]";
+    ? "opacity-100 shadow-[0_45px_130px_rgba(34,211,238,0.26)] ring-1 ring-cyan-400/15"
+    : "opacity-80 shadow-[0_22px_80px_rgba(0,0,0,0.14)] scale-[0.99] saturate-90";
 
   const style = isMaximized
     ? {
@@ -93,13 +93,13 @@ export default function Window({
   return (
     <section
       aria-label={title}
-      className={`absolute left-0 top-0 pointer-events-auto overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 backdrop-blur-2xl transition duration-300 will-change-transform ${activeClasses}`}
+      className={`absolute left-0 top-0 pointer-events-auto overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 backdrop-blur-2xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${activeClasses}`}
       style={style}
       onPointerDown={() => onFocus?.()}
     >
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-sky-300 to-violet-400 opacity-90" />
 
-      <div className="window-header flex items-center justify-between gap-4 border-b border-white/10 bg-white/10 backdrop-blur-xl">
+      <div className={`window-header flex items-center justify-between gap-4 border-b ${isActive ? "border-cyan-400/20 bg-white/15" : "border-white/10 bg-black/20"} backdrop-blur-xl`}> 
         <div
           className="flex flex-1 cursor-grab items-center gap-3 px-6 py-4 active:cursor-grabbing touch-none"
           onPointerDown={handlePointerDown}

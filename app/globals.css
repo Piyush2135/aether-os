@@ -23,4 +23,32 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.animate-ambient-drift {
+  animation: ambient-drift 18s ease-in-out infinite;
+}
+
+@keyframes ambient-drift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(12px, -8px, 0) scale(1.03);
+  }
+}
+
+.terminal-glow {
+  background: radial-gradient(circle at top left, rgba(34,211,238,0.14), transparent 45%);
+}
+
+.terminal-line {
+  transition: opacity 240ms ease, transform 240ms ease;
+}
+
+.terminal-line-enter {
+  opacity: 0;
+  transform: translateY(4px);
 }

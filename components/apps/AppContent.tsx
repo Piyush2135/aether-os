@@ -1,37 +1,18 @@
 "use client";
 
+import AiCoreApp from "./AiCoreApp";
 import TerminalApp from "./TerminalApp";
 import type { AppId } from "./appData";
 
 type AppContentProps = {
   appId: AppId;
+  onLaunchAICore?: () => void;
 };
 
-export function AppContent({ appId }: AppContentProps) {
+export function AppContent({ appId, onLaunchAICore }: AppContentProps) {
   switch (appId) {
     case "ai-core":
-      return (
-        <div className="space-y-5">
-          <div className="rounded-[1.75rem] border border-white/10 bg-black/10 p-5 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
-            <p className="text-xs uppercase tracking-[0.35em] text-cyan-300/70">AI Core Dashboard</p>
-            <p className="mt-3 text-base text-gray-200 leading-7">
-              Neural models are active and learning from ambient system telemetry. Auto-optimization mode is currently engaged.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-gray-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]">
-              <p className="text-xs uppercase tracking-[0.3em] text-cyan-300/70">Inference Load</p>
-              <p className="mt-3 text-2xl font-semibold text-white">72%</p>
-              <p className="mt-2 text-xs text-gray-400">Sustained processing for adaptive response streams.</p>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-gray-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]">
-              <p className="text-xs uppercase tracking-[0.3em] text-cyan-300/70">Prediction Stability</p>
-              <p className="mt-3 text-2xl font-semibold text-white">98.2%</p>
-              <p className="mt-2 text-xs text-gray-400">AI confidence across live neural channels.</p>
-            </div>
-          </div>
-        </div>
-      );
+      return <AiCoreApp />;
 
     case "file-system":
       return (
@@ -96,7 +77,7 @@ export function AppContent({ appId }: AppContentProps) {
       );
 
     case "terminal":
-      return <TerminalApp />;
+      return <TerminalApp onLaunchAICore={onLaunchAICore} />;
 
     default:
       return null;

@@ -21,16 +21,18 @@ export function useWindowManager(apps: AppDefinition[]) {
   const lastOpenTime = useRef(0);
 
   const setTopWindow = (instanceId: string) => {
-    const next = topZIndex + 1;
-    setTopZIndex(next);
-    setActiveWindowId(instanceId);
-    setWindows((prev) =>
-      prev.map((window) =>
-        window.instanceId === instanceId
-          ? { ...window, zIndex: next, isMinimized: false }
-          : window
-      )
-    );
+    setTopZIndex((currentTop) => {
+      const next = currentTop + 1;
+      setActiveWindowId(instanceId);
+      setWindows((prev) =>
+        prev.map((window) =>
+          window.instanceId === instanceId
+            ? { ...window, zIndex: next, isMinimized: false }
+            : window
+        )
+      );
+      return next;
+    });
   };
 
   const openApp = (appId: AppId) => {
@@ -41,24 +43,37 @@ export function useWindowManager(apps: AppDefinition[]) {
     const appDefinition = apps.find((app) => app.id === appId);
     if (!appDefinition) return;
 
-    const next = topZIndex + 1;
-    setTopZIndex(next);
-    const newWindow: ActiveWindow = {
-      instanceId: `${appId}-${Date.now()}`,
-      appId,
-      title: appDefinition.title,
-      icon: appDefinition.icon,
-      zIndex: next,
-      isMinimized: false,
-      isMaximized: false,
-      initialPosition: {
-        x: 72 + windows.length * 30,
-        y: 96 + windows.length * 28,
-      },
-    };
+    const existingMinimized = windows.find(
+      (window) => window.appId === appId && window.isMinimized
+    );
 
-    setWindows((prev) => [...prev, newWindow]);
-    setActiveWindowId(newWindow.instanceId);
+    if (existingMinimized) {
+      setTopWindow(existingMinimized.instanceId);
+      return;
+    }
+
+    setTopZIndex((currentTop) => {
+      const next = currentTop + 1;
+      const offsetX = 64 + (windows.length % 3) * 36;
+      const offsetY = 92 + Math.floor(windows.length / 3) * 24;
+      const newWindow: ActiveWindow = {
+        instanceId: `${appId}-${Date.now()}`,
+        appId,
+        title: appDefinition.title,
+        icon: appDefinition.icon,
+        zIndex: next,
+        isMinimized: false,
+        isMaximized: false,
+        initialPosition: {
+          x: offsetX,
+          y: offsetY,
+        },
+      };
+
+      setWindows((prev) => [...prev, newWindow]);
+      setActiveWindowId(newWindow.instanceId);
+      return next;
+    });
   };
 
   const closeWindow = (instanceId: string) => {
