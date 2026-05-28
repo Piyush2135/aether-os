@@ -1,16 +1,20 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { ChevronDown, Maximize2, Minimize2, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 type WindowProps = {
   title: string;
   subtitle?: string;
   icon?: LucideIcon;
+  isActive?: boolean;
+  isMaximized?: boolean;
   zIndex?: number;
   initialPosition?: { x: number; y: number };
   onClose?: () => void;
   onFocus?: () => void;
+  onMinimize?: () => void;
+  onToggleMaximize?: () => void;
   children: React.ReactNode;
 };
 
@@ -18,10 +22,14 @@ export default function Window({
   title,
   subtitle,
   icon: Icon,
+  isActive = false,
+  isMaximized = false,
   zIndex = 20,
   initialPosition = { x: 0, y: 0 },
   onClose,
   onFocus,
+  onMinimize,
+  onToggleMaximize,
   children,
 }: WindowProps) {
   const [position, setPosition] = useState(initialPosition);
@@ -63,11 +71,30 @@ export default function Window({
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
+  const activeClasses = isActive
+    ? "opacity-100 shadow-[0_40px_120px_rgba(34,211,238,0.22)]"
+    : "opacity-80 shadow-[0_25px_90px_rgba(0,0,0,0.18)] scale-[0.99]";
+
+  const style = isMaximized
+    ? {
+        left: 32,
+        top: 88,
+        width: "calc(100% - 64px)",
+        maxWidth: "none",
+        height: "calc(100vh - 160px)",
+        transform: "none",
+        zIndex,
+      }
+    : {
+        transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
+        zIndex,
+      };
+
   return (
     <section
       aria-label={title}
-      className="absolute left-0 top-0 w-full max-w-[540px] pointer-events-auto overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 shadow-[0_30px_90px_rgba(2,12,27,0.45)] backdrop-blur-2xl transition duration-300 will-change-transform hover:-translate-y-1 hover:shadow-[0_40px_120px_rgba(34,211,238,0.18)]"
-      style={{ transform: `translate3d(${position.x}px, ${position.y}px, 0)`, zIndex }}
+      className={`absolute left-0 top-0 pointer-events-auto overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 backdrop-blur-2xl transition duration-300 will-change-transform ${activeClasses}`}
+      style={style}
       onPointerDown={() => onFocus?.()}
     >
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-sky-300 to-violet-400 opacity-90" />
@@ -88,6 +115,30 @@ export default function Window({
         </div>
 
         <div className="flex items-center gap-3 px-4">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onMinimize?.();
+            }}
+            onPointerDown={(event) => event.stopPropagation()}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-cyan-200 transition-all duration-200 hover:bg-white/10 hover:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+            aria-label="Minimize window"
+          >
+            <ChevronDown className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onToggleMaximize?.();
+            }}
+            onPointerDown={(event) => event.stopPropagation()}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-cyan-200 transition-all duration-200 hover:bg-white/10 hover:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+            aria-label={isMaximized ? "Restore window" : "Maximize window"}
+          >
+            {isMaximized ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          </button>
           <button
             type="button"
             onClick={(event) => {

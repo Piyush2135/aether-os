@@ -5,7 +5,16 @@ import { useWindowManager } from "@/components/useWindowManager";
 import { apps } from "@/components/apps/appData";
 
 export default function Home() {
-  const { windows, openApp, closeWindow, focusWindow } = useWindowManager(apps);
+  const {
+    windows,
+    activeWindowId,
+    openApp,
+    closeWindow,
+    focusWindow,
+    minimizeWindow,
+    toggleMaximizeWindow,
+    restoreWindow,
+  } = useWindowManager(apps);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#02040b] text-white">
@@ -18,9 +27,13 @@ export default function Home() {
       <WindowLayer
         apps={apps}
         windows={windows}
+        activeWindowId={activeWindowId}
         onOpen={openApp}
         onClose={closeWindow}
         onFocus={focusWindow}
+        onMinimize={minimizeWindow}
+        onToggleMaximize={toggleMaximizeWindow}
+        onRestore={restoreWindow}
       />
 
       <div className="relative z-10 px-4 pt-20 pb-16 sm:px-6 lg:px-10">
