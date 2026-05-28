@@ -1,16 +1,88 @@
 "use client";
+import { useState } from "react";
+import { Cpu, Folder, Globe, Terminal } from "lucide-react";
 import TopBar from "@/components/topbar";
 import Window from "@/components/Window";
-import { Cpu, Folder, Globe, Terminal } from "lucide-react";
+import Dock from "@/components/Dock";
+import { AppContent } from "@/components/apps/AppContent";
+import { apps, type AppId } from "@/components/apps/appData";
+
+type ActiveWindow = {
+  instanceId: string;
+  appId: AppId;
+  title: string;
+  zIndex: number;
+  icon: typeof Cpu;
+  initialPosition: { x: number; y: number };
+};
 
 export default function Home() {
+  const [windows, setWindows] = useState<ActiveWindow[]>([]);
+  const [topZIndex, setTopZIndex] = useState(40);
+
+  const openApp = (appId: AppId) => {
+    const appDefinition = apps.find((app) => app.id === appId);
+    if (!appDefinition) return;
+
+    setTopZIndex((current) => {
+      const next = current + 1;
+      setWindows((prev) => [
+        ...prev,
+        {
+          instanceId: `${appId}-${Date.now()}`,
+          appId,
+          title: appDefinition.title,
+          icon: appDefinition.icon,
+          zIndex: next,
+          initialPosition: {
+            x: 64 + prev.length * 30,
+            y: 100 + prev.length * 24,
+          },
+        },
+      ]);
+      return next;
+    });
+  };
+
+  const closeWindow = (instanceId: string) => {
+    setWindows((prev) => prev.filter((window) => window.instanceId !== instanceId));
+  };
+
+  const focusWindow = (instanceId: string) => {
+    setTopZIndex((current) => {
+      const next = current + 1;
+      setWindows((prev) =>
+        prev.map((window) =>
+          window.instanceId === instanceId ? { ...window, zIndex: next } : window
+        )
+      );
+      return next;
+    });
+  };
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#02040b] text-white">
       <TopBar brand="AETHER OS" statusLabel="Neural Core Active" statusActive />
 
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.16),transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(168,85,247,0.14),transparent_24%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.18),transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(168,85,247,0.14),transparent_24%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04),transparent_60%)]" />
+
+      <div className="absolute inset-0 z-30 pointer-events-none px-4 pt-20 pb-16 sm:px-6 lg:px-10">
+        {windows.map((window) => (
+          <Window
+            key={window.instanceId}
+            title={window.title}
+            icon={window.icon}
+            zIndex={window.zIndex}
+            initialPosition={window.initialPosition}
+            onClose={() => closeWindow(window.instanceId)}
+            onFocus={() => focusWindow(window.instanceId)}
+          >
+            <AppContent appId={window.appId} />
+          </Window>
+        ))}
+      </div>
 
       <div className="relative z-10 px-4 pt-20 pb-16 sm:px-6 lg:px-10">
         <section className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl flex-col items-center justify-center gap-10 py-8 lg:py-12">
@@ -28,45 +100,45 @@ export default function Home() {
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
-              <button className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-400/25 via-sky-400/20 to-violet-400/25 px-10 py-4 text-sm font-semibold text-cyan-100 shadow-[0_24px_80px_rgba(34,211,238,0.18)] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] border border-cyan-300/20 backdrop-blur-xl">
+              <button
+                type="button"
+                onClick={() => openApp("ai-core")}
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-400/25 via-sky-400/20 to-violet-400/25 px-10 py-4 text-sm font-semibold text-cyan-100 shadow-[0_24px_80px_rgba(34,211,238,0.18)] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] border border-cyan-300/20 backdrop-blur-xl"
+              >
                 Initialize Neural Core
               </button>
-              <button className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-10 py-4 text-sm font-medium text-gray-200 transition-all duration-300 hover:border-cyan-400/30 hover:text-white hover:bg-white/10">
+              <button
+                type="button"
+                onClick={() => openApp("terminal")}
+                className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-10 py-4 text-sm font-medium text-gray-200 transition-all duration-300 hover:border-cyan-400/30 hover:text-white hover:bg-white/10"
+              >
                 Open System Console
               </button>
             </div>
           </div>
 
           <div className="w-full max-w-[620px] rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_40px_120px_rgba(0,0,0,0.22)] backdrop-blur-3xl ring-1 ring-white/5">
-            <Window title="Neural Dashboard">
-              <div className="space-y-6">
-                <div className="rounded-[1.75rem] border border-white/10 bg-black/10 p-5 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
-                  <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">
-                    Welcome to Aether OS
-                  </p>
-                  <p className="mt-3 text-base text-gray-200 leading-7">
-                    Neural systems online. AI core initialized successfully. The operating environment is optimized for low-latency transitions and immersive glassmorphic visuals.
-                  </p>
-                </div>
+            <div className="space-y-6">
+              <div className="rounded-[1.75rem] border border-white/10 bg-black/10 p-5 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]">
+                <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">Welcome to Aether OS</p>
+                <p className="mt-3 text-base text-gray-200 leading-7">
+                  Neural systems online. AI core initialized successfully. The operating environment is optimized for low-latency transitions and immersive glassmorphic visuals.
+                </p>
+              </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-gray-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]">
-                    <p className="text-xs uppercase tracking-[0.3em] text-cyan-300/70">
-                      System Throughput
-                    </p>
-                    <p className="mt-3 text-2xl font-semibold text-white">98.7%</p>
-                    <p className="mt-2 text-xs text-gray-400">Realtime performance monitoring and kernel efficiency.</p>
-                  </div>
-                  <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-gray-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]">
-                    <p className="text-xs uppercase tracking-[0.3em] text-cyan-300/70">
-                      Network Sync
-                    </p>
-                    <p className="mt-3 text-2xl font-semibold text-white">Stable</p>
-                    <p className="mt-2 text-xs text-gray-400">Secure connectivity across AI services and virtual shells.</p>
-                  </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-gray-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]">
+                  <p className="text-xs uppercase tracking-[0.3em] text-cyan-300/70">System Throughput</p>
+                  <p className="mt-3 text-2xl font-semibold text-white">98.7%</p>
+                  <p className="mt-2 text-xs text-gray-400">Realtime performance monitoring and kernel efficiency.</p>
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-gray-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]">
+                  <p className="text-xs uppercase tracking-[0.3em] text-cyan-300/70">Network Sync</p>
+                  <p className="mt-3 text-2xl font-semibold text-white">Stable</p>
+                  <p className="mt-2 text-xs text-gray-400">Secure connectivity across AI services and virtual shells.</p>
                 </div>
               </div>
-            </Window>
+            </div>
           </div>
         </section>
 
@@ -78,21 +150,7 @@ export default function Home() {
         </div>
 
         <div className="absolute bottom-6 left-1/2 z-20 w-full max-w-3xl -translate-x-1/2 px-4">
-          <div className="flex items-center justify-center gap-6 rounded-3xl border border-white/10 bg-white/5 px-6 py-4 shadow-[0_0_45px_rgba(255,255,255,0.08)] backdrop-blur-3xl">
-            {[
-              { icon: Cpu, label: "System" },
-              { icon: Folder, label: "Files" },
-              { icon: Globe, label: "Network" },
-              { icon: Terminal, label: "Shell" },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <button key={item.label} className="group flex h-14 w-14 items-center justify-center rounded-3xl border border-white/10 bg-black/20 text-cyan-300 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/30 hover:bg-cyan-500/15 hover:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400/30">
-                  <Icon className="h-6 w-6 transition-transform duration-300 group-hover:scale-110" />
-                </button>
-              );
-            })}
-          </div>
+          <Dock apps={apps} onOpen={openApp} />
         </div>
       </div>
     </main>
