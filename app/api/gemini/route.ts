@@ -1,4 +1,4 @@
-import { createGeminiStream } from "@/lib/gemini";
+import { createGeminiStream } from "../../../lib/gemini";
 import type { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {

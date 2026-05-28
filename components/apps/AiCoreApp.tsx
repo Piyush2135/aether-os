@@ -60,12 +60,12 @@ export default function AiCoreApp() {
     if (!trimmed || isThinking) return;
 
     const userMessage: Message = {
-      id: `user-${Date.now()}`,
+      id: `user-${crypto.randomUUID()}`,
       sender: "user",
       text: trimmed,
     };
 
-    const assistantId = `assistant-${Date.now()}`;
+    const assistantId = `assistant-${crypto.randomUUID()}`;
     const assistantPlaceholder: Message = {
       id: assistantId,
       sender: "core",

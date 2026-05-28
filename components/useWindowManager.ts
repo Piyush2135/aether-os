@@ -57,7 +57,7 @@ export function useWindowManager(apps: AppDefinition[]) {
       const offsetX = 64 + (windows.length % 3) * 36;
       const offsetY = 92 + Math.floor(windows.length / 3) * 24;
       const newWindow: ActiveWindow = {
-        instanceId: `${appId}-${Date.now()}`,
+        instanceId: `${appId}-${crypto.randomUUID()}`,
         appId,
         title: appDefinition.title,
         icon: appDefinition.icon,
