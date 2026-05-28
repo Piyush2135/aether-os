@@ -1,5 +1,6 @@
 "use client";
 
+import TerminalApp from "./TerminalApp";
 import type { AppId } from "./appData";
 
 type AppContentProps = {
@@ -95,54 +96,7 @@ export function AppContent({ appId }: AppContentProps) {
       );
 
     case "terminal":
-      return (
-        <div className="space-y-5">
-          <div className="rounded-[1.75rem] border border-white/10 bg-black/10 p-5 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
-            <p className="text-xs uppercase tracking-[0.35em] text-cyan-300/70">Terminal Shell</p>
-            <p className="mt-3 text-base text-gray-200 leading-7">
-              Execute commands, inspect logs, and monitor low-level OS services from the Aether command shell.
-            </p>
-          </div>
-
-          <div className="rounded-[1.75rem] border border-white/10 bg-black/20 p-5 shadow-[0_0_40px_rgba(34,211,238,0.12)]">
-            <div className="mb-4 flex items-center justify-between rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-xs uppercase tracking-[0.3em] text-cyan-300/75">
-              <span>Session</span>
-              <span className="rounded-full bg-cyan-400/10 px-2 py-1 text-cyan-100">live</span>
-            </div>
-
-            <div className="space-y-3 rounded-[1.5rem] border border-white/10 bg-[#03101c]/90 p-4 font-mono text-sm text-green-200 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]">
-              <div className="space-y-1">
-                <p>{'>'} system.status()</p>
-                <p className="text-gray-300">Aether Core: Online</p>
-                <p className="text-gray-300">Network: Secure</p>
-                <p className="text-gray-300">AI Interface: Stable</p>
-              </div>
-              <div className="space-y-1 border-t border-white/10 pt-4">
-                <p>{'>'} storage.check("main")</p>
-                <p className="text-gray-300">Storage health: 100%</p>
-                <p className="text-gray-300">Active volumes: 3</p>
-              </div>
-              <div className="space-y-1 border-t border-white/10 pt-4">
-                <p>{'>'} security.scan --fast</p>
-                <p className="text-gray-300">Threat matrix: clear</p>
-                <p className="text-gray-300">Firewall status: hardened</p>
-              </div>
-            </div>
-
-            <div className="mt-4 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]">
-              <div className="flex items-center justify-between">
-                <span className="uppercase tracking-[0.25em] text-[0.65rem] text-cyan-300/80">Quick commands</span>
-                <span className="text-[0.65rem] text-gray-400">ctrl+enter</span>
-              </div>
-              <ul className="mt-3 space-y-2 leading-6 text-white/80">
-                <li>system.reboot()</li>
-                <li>network.trace()</li>
-                <li>ai.optimize(mode=fast)</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      );
+      return <TerminalApp />;
 
     default:
       return null;
