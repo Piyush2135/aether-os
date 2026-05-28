@@ -66,7 +66,7 @@ export default function Window({
   return (
     <section
       aria-label={title}
-      className="absolute left-0 top-0 w-full max-w-[540px] pointer-events-auto overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 shadow-[0_30px_90px_rgba(2,12,27,0.45)] backdrop-blur-2xl transition-transform duration-300 hover:-translate-y-1"
+      className="absolute left-0 top-0 w-full max-w-[540px] pointer-events-auto overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 shadow-[0_30px_90px_rgba(2,12,27,0.45)] backdrop-blur-2xl transition duration-300 will-change-transform hover:-translate-y-1 hover:shadow-[0_40px_120px_rgba(34,211,238,0.18)]"
       style={{ transform: `translate3d(${position.x}px, ${position.y}px, 0)`, zIndex }}
       onPointerDown={() => onFocus?.()}
     >

@@ -1,64 +1,11 @@
 "use client";
-import { useState } from "react";
-import { Cpu, Folder, Globe, Terminal } from "lucide-react";
 import TopBar from "@/components/topbar";
-import Window from "@/components/Window";
-import Dock from "@/components/Dock";
-import { AppContent } from "@/components/apps/AppContent";
-import { apps, type AppId } from "@/components/apps/appData";
-
-type ActiveWindow = {
-  instanceId: string;
-  appId: AppId;
-  title: string;
-  zIndex: number;
-  icon: typeof Cpu;
-  initialPosition: { x: number; y: number };
-};
+import WindowLayer from "@/components/WindowLayer";
+import { useWindowManager } from "@/components/useWindowManager";
+import { apps } from "@/components/apps/appData";
 
 export default function Home() {
-  const [windows, setWindows] = useState<ActiveWindow[]>([]);
-  const [topZIndex, setTopZIndex] = useState(40);
-
-  const openApp = (appId: AppId) => {
-    const appDefinition = apps.find((app) => app.id === appId);
-    if (!appDefinition) return;
-
-    setTopZIndex((current) => {
-      const next = current + 1;
-      setWindows((prev) => [
-        ...prev,
-        {
-          instanceId: `${appId}-${Date.now()}`,
-          appId,
-          title: appDefinition.title,
-          icon: appDefinition.icon,
-          zIndex: next,
-          initialPosition: {
-            x: 64 + prev.length * 30,
-            y: 100 + prev.length * 24,
-          },
-        },
-      ]);
-      return next;
-    });
-  };
-
-  const closeWindow = (instanceId: string) => {
-    setWindows((prev) => prev.filter((window) => window.instanceId !== instanceId));
-  };
-
-  const focusWindow = (instanceId: string) => {
-    setTopZIndex((current) => {
-      const next = current + 1;
-      setWindows((prev) =>
-        prev.map((window) =>
-          window.instanceId === instanceId ? { ...window, zIndex: next } : window
-        )
-      );
-      return next;
-    });
-  };
+  const { windows, openApp, closeWindow, focusWindow } = useWindowManager(apps);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#02040b] text-white">
@@ -68,21 +15,13 @@ export default function Home() {
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04),transparent_60%)]" />
 
-      <div className="absolute inset-0 z-30 pointer-events-none px-4 pt-20 pb-16 sm:px-6 lg:px-10">
-        {windows.map((window) => (
-          <Window
-            key={window.instanceId}
-            title={window.title}
-            icon={window.icon}
-            zIndex={window.zIndex}
-            initialPosition={window.initialPosition}
-            onClose={() => closeWindow(window.instanceId)}
-            onFocus={() => focusWindow(window.instanceId)}
-          >
-            <AppContent appId={window.appId} />
-          </Window>
-        ))}
-      </div>
+      <WindowLayer
+        apps={apps}
+        windows={windows}
+        onOpen={openApp}
+        onClose={closeWindow}
+        onFocus={focusWindow}
+      />
 
       <div className="relative z-10 px-4 pt-20 pb-16 sm:px-6 lg:px-10">
         <section className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl flex-col items-center justify-center gap-10 py-8 lg:py-12">
@@ -147,10 +86,6 @@ export default function Home() {
             <div className="inline-flex h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.3)]" />
             System core stable · Glass AI display ready · Responsive OS simulation
           </div>
-        </div>
-
-        <div className="absolute bottom-6 left-1/2 z-20 w-full max-w-3xl -translate-x-1/2 px-4">
-          <Dock apps={apps} onOpen={openApp} />
         </div>
       </div>
     </main>
