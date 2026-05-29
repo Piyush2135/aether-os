@@ -214,15 +214,18 @@ The implementation combines:
 
 ## Desktop Interface
 
-![Desktop UI](./screenshots/Aether-home-page-ui.png)
+![Desktop UI](./screenshots/aether-home-page-ui.png)
 
-## Neural Core
+## Terminal Command Line
 
-![Neural Core](./screenshots/command_prompt_terminal-ui.png)
+![Terminal](./screenshots/command_prompt_terminal-ui.png)
 
-## Window Management System
+## Multiple Window Management System
 
-![Window System](./multiple-windows-functionality.png)
+![Window System](./screenshots/multiple-windows-functionality.png)
+
+## Neural AI
+![AI Core](./screenshots/neural-AI-command-line.png)
 
 * desktop interface
 * Neural Core
