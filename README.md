@@ -214,15 +214,15 @@ The implementation combines:
 
 ## Desktop Interface
 
-![Desktop UI](./screenshots/desktop-ui.png)
+![Desktop UI](./screenshots/Aether-home-page-ui.png)
 
 ## Neural Core
 
-![Neural Core](./screenshots/neural-core.png)
+![Neural Core](./screenshots/command_prompt_terminal-ui.png)
 
 ## Window Management System
 
-![Window System](./screenshots/window-system.png)
+![Window System](./multiple-windows-functionality.png)
 
 * desktop interface
 * Neural Core
