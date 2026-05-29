@@ -212,6 +212,18 @@ The implementation combines:
 
 
 
+## Desktop Interface
+
+![Desktop UI](./screenshots/desktop-ui.png)
+
+## Neural Core
+
+![Neural Core](./screenshots/neural-core.png)
+
+## Window Management System
+
+![Window System](./screenshots/window-system.png)
+
 * desktop interface
 * Neural Core
 * window system
