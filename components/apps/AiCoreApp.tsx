@@ -13,7 +13,7 @@ const initialMessages: Message[] = [
   {
     id: "welcome",
     sender: "core",
-    text: "Neural Core online. I am Aether, your adaptive system assistant. Ask me anything about the operating environment or run a diagnostic command.",
+    text: "Aether OS is ready. Systems are stable. How can I assist with diagnostics, development, or workflow planning?",
   },
 ];
 
