@@ -38,7 +38,7 @@ export default function TopBar({
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 shadow-[0_0_40px_rgba(34,211,238,0.12)] backdrop-blur-xl">
-            <Cpu className="h-5 w-5 text-cyan-300" />
+          <Cpu className="h-5 w-5 text-cyan-300" />
           </div>
 
           <div>

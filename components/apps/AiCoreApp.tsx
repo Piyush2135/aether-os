@@ -13,7 +13,7 @@ const initialMessages: Message[] = [
   {
     id: "welcome",
     sender: "core",
-    text: "Aether OS is ready. Systems are stable. How can I assist with diagnostics, development, or workflow planning?",
+    text: "Aether OS is ready. I am here to help with system diagnostics, development guidance, workflow optimization, and creative ideation. What can I assist you with?",
   },
 ];
 
@@ -25,9 +25,9 @@ export default function AiCoreApp() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const statusLabel = useMemo(() => {
-    if (isThinking) return "Computing neural response";
-    if (error) return "Connection interrupted";
-    return "Adaptive intelligence ready";
+    if (isThinking) return "Composing response...";
+    if (error) return "Connection error";
+    return "Ready to assist";
   }, [isThinking, error]);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function AiCoreApp() {
     const assistantPlaceholder: Message = {
       id: assistantId,
       sender: "core",
-      text: "Analyzing system state...",
+      text: "...",
     };
 
     appendMessage(userMessage);
@@ -124,7 +124,7 @@ export default function AiCoreApp() {
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-cyan-300/70">AI Core</p>
             <p className="mt-3 max-w-2xl text-base text-gray-200 leading-7">
-              This is the neural intelligence layer of Aether OS. Ask it to inspect system state, optimize workflows, or explain shell commands.
+              Neural intelligence powering Aether OS. Get insights on system performance, solve problems, optimize your workflow, or explore ideas with deep, thoughtful responses.
             </p>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-200 shadow-[0_12px_40px_rgba(34,211,238,0.12)]">
@@ -193,7 +193,7 @@ export default function AiCoreApp() {
               </button>
             </div>
             <p className="mt-3 text-xs text-gray-400">
-              {isThinking ? "Aether is composing a neural response..." : "Use natural commands to inspect or optimize the OS."}
+              {isThinking ? "Aether is processing your request..." : "Ask anything - technical questions, creative ideas, or system help."}
             </p>
           </div>
         </div>

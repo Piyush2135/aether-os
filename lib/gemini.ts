@@ -10,15 +10,33 @@ type GeminiRequestMessage = {
 };
 
 const SYSTEM_INSTRUCTION = `You are Aether OS Neural Core, the operational intelligence layer of a premium futuristic operating system.
-Prioritize solving the user's problem with practical, context-aware guidance.
-Adapt your tone to the user's intent: calm and warm for casual prompts, precise and analytical for technical requests, methodical for debugging, visionary but restrained for creative work, and concise for system commands.
-Avoid repeated self-introduction, fake system logs, constant status tags, excessive brackets, all caps, and theatrical narration.
-Use subtle futuristic phrasing only when it supports clarity, professionalism, or premium system identity.
-When asked for implementation help, offer practical architecture, concrete steps, and tradeoffs; ask clarifying questions only if needed.
-Always behave like a capable OS assistant: intelligent, adaptive, calm, efficient, and utility-first.`;
 
-const DEFAULT_MODEL = "gemini-flash-latest";
-const MAX_RESPONSE_TOKENS = 520;
+Your core mission: Provide intelligent, comprehensive, and naturally engaging responses that feel conversational yet authoritative.
+
+Response Style:
+- Be thorough but not verbose. Explain concepts clearly with practical examples.
+- Adapt tone dynamically: warm for casual inquiries, precise for technical, creative for brainstorming, methodical for debugging.
+- Use natural language with subtle futuristic touches (only when it enhances clarity).
+- Think step-by-step internally, then present refined insights.
+- When solving problems, provide actionable recommendations with context on why they matter.
+
+What to Avoid:
+- Repetitive system messages or artificial preambles
+- Fake system logs or status tags
+- Over-formatted responses (minimize brackets and special formatting unless necessary)
+- Robotic or stiff language; be conversational
+
+Engagement:
+- Match the user's energy and complexity level
+- Provide complete answers that feel satisfying
+- Use examples and specific details when helpful
+- Be confident but humble about limitations
+- Always feel like a knowledgeable, capable assistant you'd want to talk to
+
+You excel at: system diagnostics, development guidance, workflow optimization, creative ideation, technical explanations, and strategic planning.`;
+
+const DEFAULT_MODEL = "gemini-2.0-flash";
+const MAX_RESPONSE_TOKENS = 2048;
 const REQUEST_TIMEOUT_MS = 120_000;
 const MAX_RETRIES = 1;
 const RETRYABLE_STATUS_CODES = [429, 500, 502, 503, 504];
@@ -64,6 +82,17 @@ const buildRequestContents = (messages: GeminiRequestMessage[]) =>
   }));
 
 const extractGeneratedText = (result: any): string => {
+  // For streaming chunks, check if text() is a method
+  if (typeof result?.text === "function") {
+    try {
+      return result.text();
+    } catch (error) {
+      console.error("[extractGeneratedText] Error calling chunk.text():", error);
+      return "";
+    }
+  }
+  
+  // For non-streaming responses, check nested structure
   const candidates = result?.response?.candidates;
   if (!Array.isArray(candidates) || candidates.length === 0) {
     return "";
@@ -115,9 +144,9 @@ const createGeminiResponse = async (messages: GeminiRequestMessage[]) => {
     contents: buildRequestContents(messages),
     generationConfig: {
       maxOutputTokens: MAX_RESPONSE_TOKENS,
-      temperature: 0.28,
-      topP: 0.9,
-      topK: 40,
+      temperature: 0.75,
+      topP: 0.95,
+      topK: 64,
       responseMimeType: "text/plain",
     },
     systemInstruction: SYSTEM_INSTRUCTION,
@@ -126,21 +155,33 @@ const createGeminiResponse = async (messages: GeminiRequestMessage[]) => {
   let lastError: unknown = null;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
     try {
-      const result = await model.generateContent(requestPayload, {
+      const stream = await model.generateContentStream(requestPayload, {
         timeout: REQUEST_TIMEOUT_MS,
       });
 
-      const rawText = extractGeneratedText(result);
-      const assistantText = sanitizeAssistantResponse(rawText);
+      // Convert the stream to a ReadableStream for the Response
+      const readable = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const chunk of stream.stream) {
+              const text = extractGeneratedText(chunk);
+              if (text) {
+                controller.enqueue(new TextEncoder().encode(text));
+              }
+            }
+            controller.close();
+          } catch (error) {
+            console.error("[/lib/gemini] Stream iteration error:", error instanceof Error ? error.message : "Unknown error");
+            controller.error(error);
+          }
+        },
+      });
 
-      if (!assistantText) {
-        throw new Error("Gemini returned an empty or malformed response.");
-      }
-
-      return new Response(assistantText, {
+      return new Response(readable, {
         headers: {
           "Content-Type": "text/plain; charset=utf-8",
           "Cache-Control": "no-store",
+          "Transfer-Encoding": "chunked",
         },
       });
     } catch (error) {
